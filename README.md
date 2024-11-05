@@ -12,6 +12,11 @@ sudo python3 setup.py install
 
 check: `pip show iqr_ptu2`
 
+> for Linux:
+> ```shell
+> sudo cp ./56-pan-tilt.rules /etc/udev/rules.d/
+> ```
+
 ## Usage
 
 ```python
