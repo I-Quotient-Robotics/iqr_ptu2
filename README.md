@@ -17,7 +17,7 @@ check: `pip show iqr_ptu2`
 ```python
 from iqr_ptu2 import PTU2
 
-pan_tilt = PTU2("/dev/pan_tilt") # or maybe /dev/ACM0, \\.\COMx
+pan_tilt = PTU2("/dev/pan_tilt") # or maybe /dev/ttyACM0, \\.\COMx
 
 print("SN: ", pan_tilt.sn)
 print("HW_VERSION: ", pan_tilt.hardware_version)
