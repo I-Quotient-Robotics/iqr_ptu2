@@ -10,6 +10,7 @@ cd iqr_ptu2
 sudo python3 setup.py install
 ```
 
+check: `pip show iqr_ptu2`
 
 ## Usage
 
