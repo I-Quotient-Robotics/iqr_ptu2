@@ -3,6 +3,9 @@ from struct import pack, unpack
 from time import sleep
 
 
+__version__ = '0.1'
+
+
 class PTU2:
 
     def __init__(self, serial_port:str, baudrate:int=115200, id:int=1) -> None:
@@ -31,20 +34,44 @@ class PTU2:
 
     @property
     def sn(self):
-        sn_low, sn_high = unpack('BB', pack('H', self.__get_cmd(1)))
-        sn_0 = ''.join(['0']*(4-len(str(sn_low))))
-        str_sn = f'{sn_0}{sn_low}'
+        sn_raw = self.__get_cmd(1)
+        sn_year = (sn_raw&0b1111000000000000)>>12
+        sn_num = sn_raw&0b0000111111111111
+        sn_0 = ''.join(['0']*(4-len(str(sn_num))))
+        str_sn = f'{sn_0}{sn_num}'
         hw_ver = self.hardware_version
         sw_ver = self.software_version
-        return f'PTU2{hw_ver[0]}{hw_ver[1]}{sw_ver[0]}{sw_ver[1]}{(sn_high&0b11110000)>>4}{str_sn}'
+        return f'PTU2{hw_ver[0]}{hw_ver[1]}{sw_ver[0]}{sw_ver[1]}{sn_year}{str_sn}'
+    @sn.setter
+    def sn(self, str_sn:str):
+        assert len(str_sn) == 5
+        sn_year = int(str_sn[0])
+        sn_num = int(str_sn[-4:])
+        assert sn_year >= 0 and sn_year < 16
+        assert sn_num >= 0 and sn_num < 4096
+        sn_year <<= 12
+        sn_raw = sn_year|sn_num
+        self.__set_cmd(1, sn_raw)
 
     @property
     def hardware_version(self):
         return tuple(reversed(list(unpack('BB', pack('H', self.__get_cmd(2))))))
+    @hardware_version.setter
+    def hardware_version(self, version:tuple):
+        assert len(version) == 2
+        assert version[0] >= 0 and version[0] < 256
+        assert version[1] >= 0 and version[1] < 256
+        self.__set_cmd(2, version[0]<<8|version[1])
 
     @property
     def software_version(self):
         return tuple(reversed(list(unpack('BB', pack('H', self.__get_cmd(3))))))
+    @software_version.setter
+    def software_version(self, version:tuple):
+        assert len(version) == 2
+        assert version[0] >= 0 and version[0] < 256
+        assert version[1] >= 0 and version[1] < 256
+        self.__set_cmd(3, version[0]<<8|version[1])
 
     @property
     def firmware_version(self):
