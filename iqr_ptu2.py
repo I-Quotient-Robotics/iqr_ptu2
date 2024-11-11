@@ -8,8 +8,8 @@ __version__ = '0.2'
 
 class PTU2:
 
-    def __init__(self, serial_port:str, baudrate:int=115200, id:int=1) -> None:
-        self.__client = ModbusSerialClient(serial_port, baudrate=baudrate)
+    def __init__(self, serial_port:str, baudrate:int=115200, id:int=1, timeout:float=1.0) -> None:
+        self.__client = ModbusSerialClient(serial_port, baudrate=baudrate, timeout=timeout)
         self.__id = id
     
     def __del__(self) -> None:
